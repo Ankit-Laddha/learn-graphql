@@ -1,0 +1,18 @@
+type Link {
+    id: ID!
+    url: String!
+    description: String!
+}
+
+type RootQuery {
+    allLinks: [Link]
+}
+
+type RootMutation {
+    createLink (url: String!, description: String!) : Link
+}
+
+schema {
+    query: RootQuery
+    mutation: RootMutation
+}
