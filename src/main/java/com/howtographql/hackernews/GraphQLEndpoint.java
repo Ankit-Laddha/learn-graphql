@@ -13,11 +13,14 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
 
     private static final LinkRepository linkRepository;
 
+    private static final UserRepository userRepository;
+
     static {
         //Change to `new MongoClient("<host>:<port>")`
         //if you don't have Mongo running locally on port 27017
         MongoDatabase mongo = new MongoClient().getDatabase("hackernews");
         linkRepository = new LinkRepository(mongo.getCollection("links"));
+        userRepository = new UserRepository(mongo.getCollection("users"));
     }
 
     public GraphQLEndpoint() {
@@ -27,7 +30,9 @@ public class GraphQLEndpoint extends SimpleGraphQLServlet {
     private static GraphQLSchema buildSchema() {
         return SchemaParser.newParser()
                 .file("schema.graphqls")
-                .resolvers(new RootQuery(linkRepository), new RootMutation(linkRepository))
+                .resolvers(new RootQuery(linkRepository, userRepository),
+                        new RootMutation(linkRepository, userRepository),
+                        new SigninResolver())
                 .build()
                 .makeExecutableSchema();
     }
